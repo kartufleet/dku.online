@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#006A4E">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <title>Sistem PIN Top Up Fleet</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px 20px 0 20px;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #072618, #0b3c26);
+    }
+
+    .card {
+      width: 100%;
+      max-width: 440px;
+      margin-bottom: 20px;
+      padding: 30px;
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, .3);
+      text-align: center;
+    }
+
+    /* Menu Navigation Tab */
+    .nav-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .nav-tab {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #d2ded1;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .nav-tab.active {
+      background: #fff;
+      color: #0b3c26;
+      border-color: #fff;
+    }
+
+    h2, h3 {
+      margin: 0 0 8px;
+      color: #0b3c26;
+    }
+
+    .sub {
+      margin-bottom: 20px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: #0b3c26;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      background: #f9f9f9;
+      font-size: 15px;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #0b3c26;
+      background: #fff;
+    }
+
+    input:read-only {
+      cursor: not-allowed;
+      color: #555;
+      background: #eaefe3;
+      border-color: #d2ded1;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 14px;
+      border: 0;
+      border-radius: 10px;
+      background: #0b3c26;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .65;
+      cursor: wait;
+    }
+
+    .btn-simpan {
+      margin-top: 15px;
+      background: #2e7d32;
+    }
+
+    .btn-kembali {
+      margin-bottom: 15px;
+      background: #607d6b;
+      font-size: 14px;
+    }
+
+    .input-utama {
+      color: #0b3c26;
+      font-size: 28px;
+      font-weight: bold;
+      letter-spacing: 6px;
+      text-align: center;
+    }
+
+    .result {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 12px;
+      text-align: left;
+    }
+
+    .sukses {
+      color: #2e7d32;
+      background: #e8f5e9;
+      border: 1px solid #c8e6c9;
+    }
+
+    .gagal {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 10px;
+      color: #c62828;
+      background: #ffebee;
+      border: 1px solid #ffcdd2;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .pin-title {
+      margin-bottom: 5px;
+      color: #1b5e20;
+      font-size: 13px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .pin-box {
+      margin: 10px 0;
+      padding: 10px;
+      border: 2px dashed #2e7d32;
+      border-radius: 8px;
+      background: #fff;
+      color: #000;
+      font-size: 36px;
+      font-weight: bold;
+      letter-spacing: 6px;
+      text-align: center;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0;
+      border-top: 1px solid rgba(0, 0, 0, .08);
+      color: #444;
+      font-size: 13px;
+    }
+
+    .detail-val {
+      color: #222;
+      font-weight: bold;
+      text-align: right;
+    }
+
+    .badge-aktif {
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #2e7d32;
+      color: #fff;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .loading {
+      display: none;
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(11, 60, 38, .9);
+      color: #fff;
+      font-weight: bold;
+      font-style: italic;
+      text-align: center;
+    }
+
+    #mainContainer,
+    #boxInputPin,
+    #boxAplikasi,
+    #boxTransaksi {
+      display: none;
+    }
+
+    #btnInstallPWA {
+      display: none;
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 10;
+      width: auto;
+      padding: 10px 18px;
+      border: 2px solid #fff;
+      border-radius: 50px;
+      background: #006a4e;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, .4);
+      font-size: 13px;
+    }
+
+    /* Style khusus Footer */
+    footer {
+      width: 100vw;
+      margin-top: auto;
+      background-color: #ffffff;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .footer-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 16px;
+      text-align: center;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 12px 12px 0 12px; }
+      .card { padding: 22px 18px; }
+    }
+  </style>
+</head>
+
+<body>
+  <button id="btnInstallPWA" type="button">📲 Install Aplikasi Fleet</button>
+
+  <!-- FORM LOGIN -->
+  <div class="card" id="boxLogin">
+    <h2>Login Admin Fleet</h2>
+    <div class="sub">Silakan masukkan password sistem</div>
+
+    <div class="input-group">
+      <label for="userLogin">Username:</label>
+      <input id="userLogin" type="text" value="adminfleet" readonly>
+    </div>
+
+    <div class="input-group">
+      <label for="passLogin">Password:</label>
+      <input id="passLogin" type="password" placeholder="Masukkan Password">
+    </div>
+
+    <button id="btnLogin" type="button">Masuk Sistem</button>
+  </div>
+
+  <!-- CONTAINER UTAMA -->
+  <main id="mainContainer">
+    <!-- NAVIGASI TAB MENU -->
+    <div class="nav-tabs" id="navTabs">
+      <button class="nav-tab active" id="tabCari" type="button" onclick="switchTab('cari')">🔍 Cari / Top Up</button>
+      <button class="nav-tab" id="tabInput" type="button" onclick="switchTab('input')">➕ Tambah PIN Baru</button>
+    </div>
+
+    <!-- HALAMAN 1: CARI KARTU -->
+    <section class="card" id="boxAplikasi">
+      <h2>Sistem PIN Top Up</h2>
+      <div class="sub">Validasi Kartu Fleet Direktorat Keuangan</div>
+
+      <div class="input-group">
+        <label for="inputKartu">Masukkan 4 Angka Belakang Kartu:</label>
+        <input id="inputKartu" class="input-utama" type="text"
+               maxlength="4" inputmode="numeric" pattern="[0-9]*"
+               placeholder="XXXX" autocomplete="off">
+      </div>
+
+      <button id="btnCari" type="button">Ambil Data PIN</button>
+      <div id="loader" class="loading">Memeriksa database...</div>
+      <div id="areaGagal" class="gagal"></div>
+    </section>
+      
+    <!-- HALAMAN 2: INPUT TRANSAKSI TOP UP -->
+    <section class="card" id="boxTransaksi">
+      <h2>Input Transaksi Top Up</h2>
+      <div class="sub">Data kartu berhasil ditemukan</div>
+
+      <div id="areaHasil" class="result sukses"></div>
+
+      <div class="input-group">
+        <label for="inputPpd">Nomor PPD:</label>
+        <input id="inputPpd" type="text" placeholder="Contoh: 0001/0210003/07/26">
+      </div>
+
+      <div class="input-group">
+        <label for="inputPengirim">Nama Pengirim (Unit/Bagian):</label>
+        <input id="inputPengirim" type="text" placeholder="Otomatis dari Sheet" readonly>
+      </div>
+
+      <div class="input-group">
+        <label for="inputJumlah">Jumlah Top Up Baru (Rp):</label>
+        <input id="inputJumlah" type="number" min="1" placeholder="Contoh: 500000">
+      </div>
+
+      <button class="btn-simpan" id="btnSimpanTransaksi" type="button">✓ Simpan Ke Sheet Transaksi</button>
+      <button class="btn-kembali" id="btnKembali" type="button">← Kembali ke Pencarian Kartu</button>
+    </section>
+
+    <!-- HALAMAN 3: INPUT PIN BARU -->
+    <section class="card" id="boxInputPin">
+      <h3>Input Data PIN Kartu Fleet Baru</h3>
+      <div class="sub" style="text-align:center">Tambah data kartu baru ke Sheet "Data PIN"</div>
+
+      <div class="input-group">
+        <label for="newNoLengkap">Nomor Kartu Lengkap:</label>
+        <input id="newNoLengkap" type="text" inputmode="numeric" placeholder="Contoh: 6032770012345678">
+      </div>
+
+      <div class="input-group">
+        <label for="new4Angka">4 Angka Belakang Kartu:</label>
+        <input id="new4Angka" type="text" maxlength="4" inputmode="numeric" placeholder="5678">
+      </div>
+
+      <div class="input-group">
+        <label for="newPin">PIN Kartu:</label>
+        <input id="newPin" type="text" maxlength="6" inputmode="numeric" placeholder="Masukkan PIN Kartu">
+      </div>
+
+      <div class="input-group">
+        <label for="newKet">Keterangan:</label>
+        <select id="newKet">
+          <option value="Aktif">Aktif</option>
+          <option value="Tidak Aktif">Tidak Aktif</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label for="newUnit">Bagian / Unit:</label>
+        <input id="newUnit" type="text" placeholder="Contoh: Direktorat Keuangan">
+      </div>
+
+      <button class="btn-simpan" id="btnSimpanPin" type="button">+ Simpan Data PIN</button>
+    </section>
+  </main>
+
+  <footer style="width: 100%; background-color: #ffffff; border-top: 1px solid #e5e7eb; margin-top: auto;">
+  <div style="padding: 12px 16px; text-align: center; font-size: 11px; color: #6b7280;">
+    &copy; <span id="current-year"></span> Sistem Aplikasi Kartu Fleet. Data disimpan secara lokal di browser.(By JEFFRY)
+  </div>
+</footer>
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbyN0Q4LnnXNSCpi0ArX3w8fA_ad0Y16RoM2pWxT60N-Pwkrn44J7-yO93ZUouHeufB9Vw/exec";
+
+    const $ = id => document.getElementById(id);
+    let dataKartuSistem = {};
+
+    // Auto update tahun pada footer
+    document.getElementById("current-year").textContent = new Date().getFullYear();
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    function setLoading(message = "", visible = true) {
+      $("loader").textContent = message;
+      $("loader").style.display = visible ? "block" : "none";
+    }
+
+    function setButtonState(button, disabled) {
+      button.disabled = disabled;
+    }
+
+    function resetSearchResult() {
+      $("areaGagal").style.display = "none";
+      $("areaGagal").textContent = "";
+      $("areaHasil").style.display = "none";
+    }
+
+    function switchTab(type) {
+      resetSearchResult();
+      if (type === 'cari') {
+        $("boxAplikasi").style.display = "block";
+        $("boxInputPin").style.display = "none";
+        $("boxTransaksi").style.display = "none";
+        $("navTabs").style.display = "flex";
+        $("tabCari").classList.add("active");
+        $("tabInput").classList.remove("active");
+        $("inputKartu").focus();
+      } else if (type === 'input') {
+        $("boxAplikasi").style.display = "none";
+        $("boxInputPin").style.display = "block";
+        $("boxTransaksi").style.display = "none";
+        $("navTabs").style.display = "flex";
+        $("tabInput").classList.add("active");
+        $("tabCari").classList.remove("active");
+      }
+    }
+
+    function showSearchPage() {
+      switchTab('cari');
+    }
+
+    function showTransactionPage(data) {
+      $("boxAplikasi").style.display = "none";
+      $("boxInputPin").style.display = "none";
+      $("boxTransaksi").style.display = "block";
+      $("navTabs").style.display = "none";
+
+      $("areaHasil").innerHTML = `
+        <div class="pin-title">Gunakan PIN ini di Mesin</div>
+        <div class="pin-box">${escapeHtml(data.pin)}</div>
+        <div class="detail-row">
+          <span>No Kartu Lengkap:</span>
+          <span class="detail-val">${escapeHtml(data.kartuLengkap)}</span>
+        </div>
+        <div class="detail-row">
+          <span>4 Digit Terakhir:</span>
+          <span class="detail-val">${escapeHtml(data.empatAngka)}</span>
+        </div>
+        <div class="detail-row">
+          <span>Status Kartu:</span>
+          <span class="badge-aktif">${escapeHtml(data.statusKartu)}</span>
+        </div>
+      `;
+
+      $("areaHasil").style.display = "block";
+      $("inputPengirim").value = data.unit || "";
+      $("inputPpd").focus();
+    }
+
+    async function request(url, options) {
+      const response = await fetch(url, options);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    }
+
+    function sanitizeDigits(input, maxLength = 999) {
+      input.value = input.value.replace(/\D/g, "").slice(0, maxLength);
+    }
+
+    async function prosesLogin() {
+      const button = $("btnLogin");
+      const password = $("passLogin").value.trim();
+
+      if (!password) {
+        alert("Password wajib diisi!");
+        return;
+      }
+
+      setButtonState(button, true);
+
+      try {
+        const params = new URLSearchParams({
+          action: "cekLogin",
+          u: $("userLogin").value,
+          p: password
+        });
+
+        const data = await request(`${API_URL}?${params}`);
+
+        if (data.status === "sukses") {
+          $("boxLogin").style.display = "none";
+          $("mainContainer").style.display = "block";
+          switchTab('cari');
+        } else {
+          alert(data.pesan || "Login gagal.");
+        }
+      } catch (error) {
+        alert("Gagal koneksi ke server: " + error.message);
+      } finally {
+        setButtonState(button, false);
+      }
+    }
+
+    async function simpanDataPinBaru() {
+      const button = $("btnSimpanPin");
+      const payload = {
+        action: "simpanDataPin",
+        nomorLengkap: $("newNoLengkap").value.trim(),
+        empatAngka: $("new4Angka").value.trim(),
+        pin: $("newPin").value.trim(),
+        keterangan: $("newKet").value,
+        unit: $("newUnit").value.trim()
+      };
+
+      if (!payload.nomorLengkap || !payload.empatAngka || !payload.pin || !payload.unit) {
+        alert("Nomor kartu, 4 angka belakang, PIN, dan unit wajib diisi!");
+        return;
+      }
+
+      if (!/^\d{4}$/.test(payload.empatAngka)) {
+        alert("4 angka belakang kartu harus terdiri dari 4 digit.");
+        return;
+      }
+
+      setButtonState(button, true);
+
+      try {
+        const data = await request(API_URL, {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+
+        alert(data.pesan || "Proses selesai.");
+
+        if (data.status === "sukses") {
+          ["newNoLengkap", "new4Angka", "newPin", "newUnit"].forEach(id => $(id).value = "");
+          switchTab('cari');
+        }
+      } catch (error) {
+        alert("Gagal menyimpan: " + error.message);
+      } finally {
+        setButtonState(button, false);
+      }
+    }
+
+    async function prosesCari() {
+      const input = $("inputKartu").value.trim();
+      const button = $("btnCari");
+
+      if (!/^\d{4}$/.test(input)) {
+        alert("Harap masukkan 4 digit angka belakang kartu!");
+        return;
+      }
+
+      resetSearchResult();
+      setButtonState(button, true);
+      setLoading("Memeriksa database...");
+
+      try {
+        const params = new URLSearchParams({
+          action: "cariDataTopUp",
+          empatAngka: input
+        });
+
+        const data = await request(`${API_URL}?${params}`);
+
+        if (data.status !== "sukses") {
+          $("areaGagal").textContent = data.pesan || "Data tidak ditemukan.";
+          $("areaGagal").style.display = "block";
+          return;
+        }
+
+        dataKartuSistem = data;
+        showTransactionPage(data);
+      } catch (error) {
+        $("areaGagal").textContent = "Error server: " + error.message;
+        $("areaGagal").style.display = "block";
+      } finally {
+        setLoading("", false);
+        setButtonState(button, false);
+      }
+    }
+
+    async function simpanKeTransaksi() {
+      const button = $("btnSimpanTransaksi");
+      const payload = {
+        action: "simpanTransaksi",
+        noPpd: $("inputPpd").value.trim(),
+        empatAngka: dataKartuSistem.empatAngka,
+        pin: dataKartuSistem.pin,
+        pengirim: $("inputPengirim").value.trim(),
+        jumlah: $("inputJumlah").value
+      };
+
+      if (!payload.noPpd || !payload.pengirim || !payload.jumlah) {
+        alert("Harap isi No PPD dan Jumlah Top Up!");
+        return;
+      }
+
+      setButtonState(button, true);
+
+      try {
+        const data = await request(API_URL, {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+
+        alert(data.pesan || "Proses selesai.");
+
+        if (data.status === "sukses") {
+          ["inputKartu", "inputPpd", "inputJumlah"].forEach(id => $(id).value = "");
+          dataKartuSistem = {};
+          showSearchPage();
+        }
+      } catch (error) {
+        alert("Gagal simpan transaksi: " + error.message);
+      } finally {
+        setButtonState(button, false);
+      }
+    }
+
+    $("btnLogin").addEventListener("click", prosesLogin);
+    $("btnSimpanPin").addEventListener("click", simpanDataPinBaru);
+    $("btnCari").addEventListener("click", prosesCari);
+    $("btnSimpanTransaksi").addEventListener("click", simpanKeTransaksi);
+    $("btnKembali").addEventListener("click", showSearchPage);
+
+    $("passLogin").addEventListener("keydown", event => {
+      if (event.key === "Enter") prosesLogin();
+    });
+
+    $("inputKartu").addEventListener("input", event => {
+      sanitizeDigits(event.target, 4);
+      resetSearchResult();
+    });
+
+    $("newNoLengkap").addEventListener("input", event => {
+      sanitizeDigits(event.target);
+      if (event.target.value.length >= 4) {
+        $("new4Angka").value = event.target.value.slice(-4);
+      }
+    });
+
+    $("new4Angka").addEventListener("input", event => {
+      sanitizeDigits(event.target, 4);
+    });
+
+    $("newPin").addEventListener("input", event => {
+      sanitizeDigits(event.target, 6);
+    });
+
+    $("inputKartu").addEventListener("keydown", event => {
+      if (event.key === "Enter") prosesCari();
+    });
+
+    let deferredPrompt;
+    const installButton = $("btnInstallPWA");
+
+    window.addEventListener("beforeinstallprompt", event => {
+      event.preventDefault();
+      deferredPrompt = event;
+      installButton.style.display = "block";
+    });
+
+    installButton.addEventListener("click", async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installButton.style.display = "none";
+    });
+
+    window.addEventListener("appinstalled", () => {
+  // Sembunyikan tombol jika aplikasi sudah selesai diinstal
+  installButton.style.display = "none";
+  deferredPrompt = null;
+  console.log("PWA berhasil diinstal");
+});
+    
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("sw.js?v=2")
+          .catch(error => console.error("Service worker error:", error));
+      });
+    }
+  </script>
+</body>
+</html>

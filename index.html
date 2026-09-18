@@ -322,7 +322,66 @@
       <div id="loader" class="loading">Memeriksa database...</div>
       <div id="areaGagal" class="gagal"></div>
     </section>
-      
+
+      function cariPin() {
+  const inputUser = document.getElementById('inputEmpatAngka').value.trim();
+  const btnCari = document.getElementById('btnCari');
+
+  if (!/^\d{4}$/.test(inputUser)) {
+    alert("Masukkan 4 digit angka belakang kartu.");
+    return;
+  }
+
+  // 1. Ubah status tombol untuk indikator loading
+  btnCari.disabled = true;
+  btnCari.innerText = "Memeriksa Database...";
+
+  // 2. Buat AbortController untuk membatasi batas waktu (Timeout)
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // Batas tunggu 10 detik
+
+  // 3. Panggil API Apps Script dengan sinyal timeout
+  fetch(API_URL + "?action=cariDataTopUp&empatAngka=" + encodeURIComponent(inputUser), {
+    method: "GET",
+    signal: controller.signal
+  })
+    .then(response => response.json())
+    .then(data => {
+      clearTimeout(timeoutId); // Batalkan timeout jika respon server cepat
+
+      if (data.status === "sukses") {
+        // Simpan hasil ke cache lokal untuk pencarian offline berikutnya
+        localStorage.setItem("pin_" + inputUser, JSON.stringify(data));
+        tampilkanHasil(data);
+      } else {
+        alert(data.pesan);
+      }
+    })
+    .catch(err => {
+      clearTimeout(timeoutId);
+
+      // 4. Penanganan saat server timeout atau gagal koneksi (Offline Fallback)
+      if (err.name === 'AbortError') {
+        alert("Server merespon lambat. Mencoba mengambil data dari cadangan lokal...");
+      } else {
+        alert("Gagal terhubung ke server. Memeriksa data lokal...");
+      }
+
+      // Cek apakah ada data cadangan di localStorage
+      const cachedData = localStorage.getItem("pin_" + inputUser);
+      if (cachedData) {
+        const dataLokal = JSON.parse(cachedData);
+        alert("Menampilkan data PIN dari penyimpanan lokal.");
+        tampilkanHasil(dataLokal);
+      }
+    })
+    .finally(() => {
+      // Kembalikan status tombol
+      btnCari.disabled = false;
+      btnCari.innerText = "Cari PIN";
+    });
+}
+    
     <!-- HALAMAN 2: INPUT TRANSAKSI TOP UP -->
     <section class="card" id="boxTransaksi">
       <h2>Input Transaksi Top Up</h2>
